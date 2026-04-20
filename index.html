@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valida tu Permiso - Banjercito</title>
+<title>Valida tu Permiso - banjercito.autos</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -11,155 +11,149 @@
     font-family: Arial, Helvetica, sans-serif;
     background: #ffffff;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 
-  /* ── FORM VIEW ── */
-  .page { width: 100%; max-width: 480px; padding: 0 0 40px; }
+  /* ── FORM PAGE — full width, white bg ── */
+  .form-page {
+    width: 100%;
+    padding: 28px 16px 60px;
+  }
 
-  .form-heading {
+  .form-page h1 {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
-    color: #111;
-    margin: 28px 16px 10px;
+    color: #000;
+    margin-bottom: 14px;
   }
-  .form-subtext {
-    font-size: 14px;
-    color: #222;
-    margin: 0 16px 20px;
+
+  .form-page .subtext {
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+    margin-bottom: 16px;
     line-height: 1.5;
   }
 
-  /* grey card */
+  /* grey card — full width minus small margin */
   .form-card {
-    background: #e9e9e9;
-    border-radius: 10px;
-    margin: 0 12px;
-    padding: 20px 16px 16px;
+    background: #f2f2f2;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px 20px 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
   }
 
   .field-label {
-    font-size: 11.5px;
+    font-size: 16px;
     font-weight: bold;
     color: #222;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-    line-height: 1.4;
+    margin-bottom: 8px;
+    margin-top: 16px;
+    letter-spacing: 0.1px;
   }
+  .field-label:first-child { margin-top: 0; }
+
   .field-input {
     width: 100%;
-    padding: 15px 12px;
-    border: 1px solid #c8c8c8;
-    border-radius: 8px;
-    font-size: 16px;
-    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 22px;
+    text-align: center;
     background: white;
-    color: #111;
+    color: #333;
     outline: none;
     -webkit-appearance: none;
+    line-height: 1.2;
   }
-  .field-input::placeholder { color: #aaa; font-size: 16px; }
-  .field-input:focus { border-color: #888; }
+  .field-input::placeholder {
+    color: #aaa;
+    font-size: 22px;
+    font-weight: normal;
+  }
+  .field-input:focus { border-color: #999; }
 
-  /* captcha image-like display */
-  .captcha-box {
-    background: white;
-    border: 1px solid #c8c8c8;
-    border-radius: 8px;
-    padding: 14px 12px;
-    text-align: left;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 8px;
-    color: #111;
-    font-family: 'Georgia', serif;
-    font-style: italic;
-    user-select: none;
+  /* captcha canvas */
+  .captcha-wrap {
+    margin: 20px 0 6px;
+    text-align: center;
+  }
+  #captchaCanvas {
+    display: block;
+    margin: 0 auto;
     cursor: default;
-    background-image: repeating-linear-gradient(
-      0deg, transparent, transparent 8px,
-      rgba(0,0,0,0.03) 8px, rgba(0,0,0,0.03) 9px
-    );
-    position: relative;
-    overflow: hidden;
+    user-select: none;
   }
-  .captcha-box::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    height: 1px;
-    background: rgba(0,0,0,0.18);
-  }
-
-  /* buttons */
-  .btn-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 2px;
-  }
-  .btn-clear {
-    background: #d4911a;
-    color: white;
-    border: none;
-    padding: 16px;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-right: 1px solid rgba(255,255,255,0.3);
-  }
-  .btn-validate {
-    background: #4a9048;
-    color: white;
-    border: none;
-    padding: 16px;
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-  .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
-  .btn-clear:active, .btn-validate:active { opacity: 0.85; }
 
   .error-msg {
     color: #c0392b;
     font-size: 12px;
     text-align: center;
-    padding: 8px;
+    padding: 7px;
     background: #fdecea;
-    border-radius: 6px;
+    border-radius: 4px;
+    margin-top: 10px;
     display: none;
   }
   .loading-msg {
     display: none;
     text-align: center;
-    padding: 10px;
+    padding: 8px;
     color: #555;
     font-size: 13px;
+    margin-top: 6px;
   }
   .spinner {
     display: inline-block;
-    width: 16px; height: 16px;
+    width: 14px; height: 14px;
     border: 2px solid #ccc;
-    border-top-color: #4a9048;
+    border-top-color: #4caf50;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
-    margin-right: 6px;
+    margin-right: 5px;
     vertical-align: middle;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* buttons — both green on desktop, orange+green on mobile */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 16px;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+  }
+  .btn-clear {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.25);
+  }
+  .btn-validate {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .btn-clear:hover    { background: #43a047; }
+  .btn-validate:hover { background: #43a047; }
+  .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+
 
   /* ── RESULT PAGES ── */
   .result-page {
@@ -167,32 +161,32 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 480px;
     min-height: 100vh;
-    padding-bottom: 40px;
+    padding-bottom: 50px;
   }
-  .result-page.valid-page  { background: #e8f5e2; }
+  .result-page.valid-page   { background: #e8f5e2; }
   .result-page.invalid-page { background: #fbe8e8; }
 
   .badge {
-    width: 230px; height: 230px;
+    width: 220px; height: 220px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     text-align: center;
-    margin: 36px auto 28px;
-    padding: 24px;
+    margin: 36px auto 24px;
+    padding: 20px;
+    flex-shrink: 0;
   }
   .badge-green { background: #2e9e4f; }
   .badge-red   { background: #c0392b; }
   .badge span  {
     color: white;
-    font-size: 30px;
+    font-size: 29px;
     font-weight: 900;
     line-height: 1.18;
   }
 
   .result-title {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 900;
     text-align: center;
     color: #111;
@@ -204,16 +198,19 @@
     font-size: 12px;
     color: #444;
     margin-bottom: 14px;
-    padding: 0 16px;
+    padding: 0 12px;
+    text-align: left;
+    width: 100%;
+    max-width: 560px;
   }
 
-  /* data table */
   .data-table {
     width: calc(100% - 24px);
+    max-width: 536px;
     margin: 0 12px 20px;
     border-collapse: collapse;
     border: 1px solid #bbb;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
     background: white;
   }
@@ -242,6 +239,7 @@
 
   .close-row {
     width: 100%;
+    max-width: 560px;
     display: flex;
     justify-content: flex-end;
     padding: 0 12px;
@@ -250,83 +248,49 @@
     background: #c0392b;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 14px 32px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 13px 30px;
+    font-size: 12px;
     font-weight: bold;
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
   }
-  .btn-close:active { opacity: 0.85; }
 
-  /* ── SETUP BANNER ── */
-  .setup-banner {
-    background: #fff8e1;
-    border: 1px solid #f0c040;
-    border-radius: 8px;
-    padding: 11px 14px;
-    margin: 0 12px 14px;
-    font-size: 12px;
-    color: #7a5c00;
-    line-height: 1.5;
-  }
-  .setup-banner strong { display: block; margin-bottom: 3px; font-size: 12.5px; }
-  .setup-banner a { color: #0d6efd; text-decoration: underline; }
-
-  /* ── DESKTOP ── */
-  @media (min-width: 600px) {
-    body { background: #ebebeb; }
-    .page { max-width: 680px; padding-bottom: 60px; }
-    .form-heading { font-size: 26px; margin-top: 36px; }
-    .form-card { margin: 0 20px; padding: 28px 24px; gap: 18px; }
-    .field-input { font-size: 17px; padding: 16px 14px; }
-    .captcha-box { font-size: 32px; }
-    .result-page { max-width: 680px; }
-    .badge { width: 270px; height: 270px; }
-    .badge span { font-size: 36px; }
-    .result-title { font-size: 26px; }
-    .data-table td { padding: 12px 16px; font-size: 14px; }
-    .data-table td.key { font-size: 12.5px; }
-    .data-table td.val { font-size: 15px; }
+  /* ── MOBILE: orange LIMPIAR ── */
+  @media (max-width: 500px) {
+    .btn-clear { background: #e09b2d; }
+    .btn-clear:hover { background: #c98a22; }
   }
 </style>
 </head>
 <body>
 
 <!-- ════════ FORM PAGE ════════ -->
-<div class="page" id="formPage">
-  <h1 class="form-heading">Valida tu permiso</h1>
-  <p class="form-subtext">Por favor, captura los datos que se encuentran en tu Permiso de Importación</p>
-
-  <div id="setupBanner" class="setup-banner">
-    <strong>⚙️ Configuración requerida</strong>
-    Reemplaza <code>YOUR_GOOGLE_SHEET_ID_HERE</code> en el código con el ID de tu Google Sheet publicado como CSV.
-    <a href="#" onclick="showSetupHelp();return false;">Ver instrucciones</a>
-  </div>
-
+<div class="form-page" id="formPage">
+  <h1>Valida tu permiso</h1>
+  <p class="subtext">Por favor, captura los datos que se encuentran en tu Permiso de Importación</p>
   <div class="form-card">
-    <div>
-      <div class="field-label">Folio de Permiso:</div>
-      <input class="field-input" type="text" id="folio" placeholder="Folio permiso" maxlength="20" inputmode="numeric">
-    </div>
-    <div>
-      <div class="field-label">Últimos 5 caracteres del número de serie del vehículo o HIN del vehículo:</div>
-      <input class="field-input" type="text" id="vin5" placeholder="VIN/HIN" maxlength="5" style="text-transform:uppercase;">
-    </div>
-    <div>
-      <div class="field-label">Últimos 5 caracteres del número de documento o del RFC:</div>
-      <input class="field-input" type="text" id="rfc5" placeholder="Número de documento o RFC" maxlength="5" style="text-transform:uppercase;">
+    <div class="field-label">FOLIO DE PERMISO:</div>
+    <input class="field-input" type="text" id="folio" placeholder="Folio permiso" maxlength="20" inputmode="numeric" autocomplete="off">
+
+    <div class="field-label">ÚLTIMOS 5 CARACTERES DEL NÚMERO DE SERIE DEL VEHÍCULO O HIN DEL VEHÍCULO:</div>
+    <input class="field-input" type="text" id="vin5" placeholder="VIN/HIN" maxlength="5" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+
+    <div class="field-label">ÚLTIMOS 5 CARACTERES DEL NÚMERO DE DOCUMENTO O DEL RFC:</div>
+    <input class="field-input" type="text" id="rfc5" placeholder="Número de documento o RFC" maxlength="5" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+
+    <div class="captcha-wrap">
+      <canvas id="captchaCanvas" width="220" height="52"></canvas>
     </div>
 
-    <div class="captcha-box" id="captchaDisplay"></div>
     <input class="field-input" type="text" id="captchaInput" placeholder="Captcha" maxlength="6" autocomplete="off">
 
-    <div class="error-msg" id="errorMsg"></div>
+    <div class="error-msg"   id="errorMsg"></div>
     <div class="loading-msg" id="loadingMsg"><span class="spinner"></span>Verificando permiso...</div>
 
     <div class="btn-row">
-      <button class="btn-clear" onclick="clearForm()">LIMPIAR</button>
+      <button class="btn-clear"    onclick="clearForm()">LIMPIAR</button>
       <button class="btn-validate" id="validateBtn" onclick="validatePermit()">VALIDAR</button>
     </div>
   </div>
@@ -355,26 +319,61 @@
 </div>
 
 <script>
-// ══════════════════════════════════════════
-//  CONFIGURATION
-//  Replace with your Google Sheet ID
-//  (File → Share → Publish to web → CSV → copy ID from URL)
-// ══════════════════════════════════════════
-const SHEET_ID  = "YOUR_GOOGLE_SHEET_ID_HERE";
+const SHEET_ID  = "1mvqzYpu_DU1c3CXDSEjxeB5eA0aSmThZodImFWNUUmU";
 const SHEET_GID = "0";
 
-// ── Captcha ──────────────────────────────
 let currentCaptcha = "";
 function generateCaptcha() {
   const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   currentCaptcha = Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join("");
-  document.getElementById("captchaDisplay").textContent = currentCaptcha;
+  drawCaptcha(currentCaptcha);
 }
 
-// ── Google Sheets CSV fetch ───────────────
+function drawCaptcha(text) {
+  const canvas = document.getElementById("captchaCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Font: rounded outline style
+  ctx.font = "bold 34px Arial Rounded MT Bold, Arial, sans-serif";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+
+  // Draw each character with slight random rotation for natural look
+  const chars = text.split("");
+  const totalWidth = chars.length * 30;
+  const startX = (W - totalWidth) / 2 + 15;
+
+  chars.forEach((ch, i) => {
+    ctx.save();
+    const x = startX + i * 30;
+    const y = H / 2 + (Math.random() * 4 - 2);
+    const angle = (Math.random() * 0.2 - 0.1);
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+
+    // Hollow: stroke only, no fill
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "#555";
+    ctx.lineJoin = "round";
+    ctx.strokeText(ch, 0, 0);
+    ctx.restore();
+  });
+
+  // Subtle noise lines
+  ctx.strokeStyle = "rgba(100,100,100,0.15)";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.moveTo(Math.random() * W, Math.random() * H);
+    ctx.lineTo(Math.random() * W, Math.random() * H);
+    ctx.stroke();
+  }
+}
+
 async function fetchSheetData() {
   if (SHEET_ID === "YOUR_GOOGLE_SHEET_ID_HERE") {
-    // Demo mode
     return [
       { FOLIO:"11111111", VIN5:"11111", RFC5:"11111", FECHA_ALTA:"14/ABR/2026", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" },
       { FOLIO:"22222222", VIN5:"22222", RFC5:"22222", FECHA_ALTA:"04/SEP/2025", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" }
@@ -382,7 +381,7 @@ async function fetchSheetData() {
   }
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error("Error al acceder a la hoja.");
+  if (!resp.ok) throw new Error("Error.");
   return parseCSV(await resp.text());
 }
 
@@ -391,182 +390,96 @@ function parseCSV(text) {
   const headers = lines[0].split(",").map(h => h.trim().replace(/"/g,""));
   return lines.slice(1).map(line => {
     const vals = line.split(",").map(v => v.trim().replace(/"/g,""));
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = vals[i] || "");
-    return obj;
+    const obj = {}; headers.forEach((h,i) => obj[h] = vals[i] || ""); return obj;
   });
 }
 
-// ── 180-day calculation ───────────────────
 function calcPermitStatus(fechaAltaStr) {
   const MON = {ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11};
   const MON_NAME = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
   let start;
   try {
     const p = fechaAltaStr.trim().split("/");
-    if (p.length === 3 && isNaN(p[1])) {
-      start = new Date(+p[2], MON[p[1].toUpperCase()], +p[0]);
-    } else if (p.length === 3) {
-      start = new Date(+p[2], +p[0]-1, +p[1]);
-    } else {
-      start = new Date(fechaAltaStr);
-    }
+    start = (p.length===3 && isNaN(p[1]))
+      ? new Date(+p[2], MON[p[1].toUpperCase()], +p[0])
+      : new Date(+p[2], +p[0]-1, +p[1]);
   } catch { start = new Date(fechaAltaStr); }
-
-  const expiry = new Date(start);
-  expiry.setDate(expiry.getDate() + 180);
-
+  const expiry = new Date(start); expiry.setDate(expiry.getDate()+180);
   const today = new Date(); today.setHours(0,0,0,0);
-  const dias = Math.max(0, Math.floor((expiry - today) / 86400000));
-
+  const dias = Math.max(0, Math.floor((expiry-today)/86400000));
   const d = String(expiry.getDate()).padStart(2,"0");
-  const fechaMax = `${d}/${MON_NAME[expiry.getMonth()]}/${expiry.getFullYear()}`;
-
-  return { dias, fechaMax, isValid: dias > 0 };
+  return { dias, fechaMax:`${d}/${MON_NAME[expiry.getMonth()]}/${expiry.getFullYear()}`, isValid: dias>0 };
 }
 
-// ── Validate ─────────────────────────────
 async function validatePermit() {
-  const folio  = document.getElementById("folio").value.trim();
-  const vin5   = document.getElementById("vin5").value.trim().toUpperCase();
-  const rfc5   = document.getElementById("rfc5").value.trim().toUpperCase();
+  const folio   = document.getElementById("folio").value.trim();
+  const vin5    = document.getElementById("vin5").value.trim().toUpperCase();
+  const rfc5    = document.getElementById("rfc5").value.trim().toUpperCase();
   const captcha = document.getElementById("captchaInput").value.trim();
-  const errEl  = document.getElementById("errorMsg");
+  const errEl   = document.getElementById("errorMsg");
   errEl.style.display = "none";
-
-  if (!folio || !vin5 || !rfc5 || !captcha) {
-    errEl.textContent = "Por favor completa todos los campos.";
-    errEl.style.display = "block";
-    return;
-  }
-  if (captcha !== currentCaptcha) {
-    errEl.textContent = "Captcha incorrecto. Intenta de nuevo.";
-    errEl.style.display = "block";
-    generateCaptcha();
-    document.getElementById("captchaInput").value = "";
-    return;
-  }
-
-  document.getElementById("loadingMsg").style.display = "block";
-  document.getElementById("validateBtn").disabled = true;
-
+  if (!folio||!vin5||!rfc5||!captcha) { errEl.textContent="Por favor completa todos los campos."; errEl.style.display="block"; return; }
+  if (captcha !== currentCaptcha) { errEl.textContent="Captcha incorrecto. Intenta de nuevo."; errEl.style.display="block"; generateCaptcha(); document.getElementById("captchaInput").value=""; return; }
+  document.getElementById("loadingMsg").style.display="block";
+  document.getElementById("validateBtn").disabled=true;
   try {
     const records = await fetchSheetData();
-    const match = records.find(r =>
-      r.FOLIO?.trim() === folio &&
-      r.VIN5?.trim().toUpperCase()  === vin5 &&
-      r.RFC5?.trim().toUpperCase()  === rfc5
-    );
-
-    document.getElementById("loadingMsg").style.display = "none";
-    document.getElementById("validateBtn").disabled = false;
-
+    const match = records.find(r => r.FOLIO?.trim()===folio && r.VIN5?.trim().toUpperCase()===vin5 && r.RFC5?.trim().toUpperCase()===rfc5);
+    document.getElementById("loadingMsg").style.display="none";
+    document.getElementById("validateBtn").disabled=false;
     const dateStr = formatDateTime();
-
     if (match) {
-      const { dias, fechaMax, isValid } = calcPermitStatus(match.FECHA_ALTA);
-      renderResult({
-        folio:     match.FOLIO,
-        fechaAlta: match.FECHA_ALTA,
-        fechaMax,
-        dias:      String(dias),
-        marca:     match.MARCA,
-        vin:       match.VIN,
-        modelo:    match.MODELO,
-        estatus:   isValid ? "VIGENTE" : "PERMISO VENCIDO",
-        remolque:  match.REMOLQUE
-      }, dateStr, isValid);
+      const {dias,fechaMax,isValid} = calcPermitStatus(match.FECHA_ALTA);
+      renderResult({folio:match.FOLIO,fechaAlta:match.FECHA_ALTA,fechaMax,dias:String(dias),marca:match.MARCA,vin:match.VIN,modelo:match.MODELO,estatus:isValid?"VIGENTE":"PERMISO VENCIDO",remolque:match.REMOLQUE},dateStr,isValid);
     } else {
-      renderResult({
-        folio, fechaAlta:"—", fechaMax:"—", dias:"0",
-        marca:"—", vin:"—", modelo:"—",
-        estatus:"PERMISO VENCIDO", remolque:"—"
-      }, dateStr, false);
+      renderResult({folio,fechaAlta:"—",fechaMax:"—",dias:"0",marca:"—",vin:"—",modelo:"—",estatus:"PERMISO VENCIDO",remolque:"—"},dateStr,false);
     }
   } catch(e) {
-    document.getElementById("loadingMsg").style.display = "none";
-    document.getElementById("validateBtn").disabled = false;
-    const errEl = document.getElementById("errorMsg");
-    errEl.textContent = "Error al conectar. Intenta de nuevo.";
-    errEl.style.display = "block";
-    generateCaptcha();
+    document.getElementById("loadingMsg").style.display="none";
+    document.getElementById("validateBtn").disabled=false;
+    errEl.textContent="Error al conectar. Intenta de nuevo."; errEl.style.display="block"; generateCaptcha();
   }
 }
 
 function renderResult(d, dateStr, isValid) {
-  const rows = [
-    ["FOLIO PERMISO",           d.folio],
-    ["FECHA DE ALTA",           d.fechaAlta],
-    ["FECHA MÁXIMA DE RETORNO", d.fechaMax],
-    ["DIAS DISPONIBLES",        d.dias],
-    ["MARCA",                   d.marca],
-    ["VIN",                     d.vin],
-    ["MODELO",                  d.modelo],
-    ["ESTATUS PERMISO",         d.estatus],
-    ["REMOLQUE",                d.remolque],
-  ];
-  const html = rows.map(([k,v]) =>
-    `<tr><td class="key">${k}:</td><td class="val">${v}</td></tr>`
-  ).join("");
-
-  document.getElementById("formPage").style.display = "none";
-
+  const rows=[["FOLIO PERMISO",d.folio],["FECHA DE ALTA",d.fechaAlta],["FECHA MÁXIMA DE RETORNO",d.fechaMax],["DIAS DISPONIBLES",d.dias],["MARCA",d.marca],["VIN",d.vin],["MODELO",d.modelo],["ESTATUS PERMISO",d.estatus],["REMOLQUE",d.remolque]];
+  const html=rows.map(([k,v])=>`<tr><td class="key">${k}:</td><td class="val">${v}</td></tr>`).join("");
+  document.getElementById("formPage").style.display="none";
   if (isValid) {
-    document.getElementById("validDate").textContent  = "FECHA Y HORA DE CONSULTA: " + dateStr;
-    document.getElementById("validTable").innerHTML   = html;
-    const pg = document.getElementById("validPage");
-    pg.style.display = "flex";
+    document.getElementById("validDate").textContent="FECHA Y HORA DE CONSULTA: "+dateStr;
+    document.getElementById("validTable").innerHTML=html;
+    document.getElementById("validPage").style.display="flex";
   } else {
-    document.getElementById("invalidDate").textContent = "FECHA Y HORA DE CONSULTA: " + dateStr;
-    document.getElementById("invalidTable").innerHTML  = html;
-    const pg = document.getElementById("invalidPage");
-    pg.style.display = "flex";
+    document.getElementById("invalidDate").textContent="FECHA Y HORA DE CONSULTA: "+dateStr;
+    document.getElementById("invalidTable").innerHTML=html;
+    document.getElementById("invalidPage").style.display="flex";
   }
   window.scrollTo(0,0);
 }
 
 function formatDateTime() {
-  const now = new Date();
-  const M = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const p = n => String(n).padStart(2,"0");
+  const now=new Date();
+  const M=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const p=n=>String(n).padStart(2,"0");
   return `${now.getDate()} de ${M[now.getMonth()]} del ${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
 }
 
 function clearForm() {
-  ["folio","vin5","rfc5","captchaInput"].forEach(id => document.getElementById(id).value = "");
-  document.getElementById("errorMsg").style.display = "none";
+  ["folio","vin5","rfc5","captchaInput"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("errorMsg").style.display="none";
   generateCaptcha();
 }
 
 function resetAll() {
-  document.getElementById("validPage").style.display   = "none";
-  document.getElementById("invalidPage").style.display = "none";
-  document.getElementById("formPage").style.display    = "block";
-  clearForm();
-  window.scrollTo(0,0);
+  document.getElementById("validPage").style.display="none";
+  document.getElementById("invalidPage").style.display="none";
+  document.getElementById("formPage").style.display="block";
+  clearForm(); window.scrollTo(0,0);
 }
 
-function showSetupHelp() {
-  alert(
-    "CONFIGURAR GOOGLE SHEETS:\n\n" +
-    "1. Crea una hoja con columnas exactas:\n" +
-    "   FOLIO, VIN5, RFC5, FECHA_ALTA, MARCA, VIN, MODELO, REMOLQUE\n\n" +
-    "2. FECHA_ALTA en formato DD/MES/AAAA (ej: 14/ABR/2026)\n" +
-    "   El sistema calcula automáticamente 180 días y días disponibles.\n\n" +
-    "3. Archivo → Compartir → Publicar en la web → CSV → Publicar\n\n" +
-    "4. Copia el ID de la URL:\n" +
-    "   docs.google.com/spreadsheets/d/[ESTE_ID]/edit\n\n" +
-    "5. Reemplaza YOUR_GOOGLE_SHEET_ID_HERE en el HTML con ese ID.\n\n" +
-    "──────────────────────────\n" +
-    "DEMO VIGENTE:  FOLIO=11111111 / VIN5=11111 / RFC5=11111\n" +
-    "DEMO VENCIDO:  FOLIO=22222222 / VIN5=22222 / RFC5=22222"
-  );
-}
 
-// ── Init ─────────────────────────────────
-if (SHEET_ID !== "YOUR_GOOGLE_SHEET_ID_HERE") {
-  document.getElementById("setupBanner").style.display = "none";
-}
+
+
 generateCaptcha();
 </script>
 </body>
