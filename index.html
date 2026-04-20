@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valida tu Permiso - Banjercito</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── FORM VIEW ── */
+  .page { width: 100%; max-width: 480px; padding: 0 0 40px; }
+
+  .form-heading {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #111;
+    margin: 28px 16px 10px;
+  }
+  .form-subtext {
+    font-size: 14px;
+    color: #222;
+    margin: 0 16px 20px;
+    line-height: 1.5;
+  }
+
+  /* grey card */
+  .form-card {
+    background: #e9e9e9;
+    border-radius: 10px;
+    margin: 0 12px;
+    padding: 20px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field-label {
+    font-size: 11.5px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    line-height: 1.4;
+  }
+  .field-input {
+    width: 100%;
+    padding: 15px 12px;
+    border: 1px solid #c8c8c8;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: left;
+    background: white;
+    color: #111;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: #aaa; font-size: 16px; }
+  .field-input:focus { border-color: #888; }
+
+  /* captcha image-like display */
+  .captcha-box {
+    background: white;
+    border: 1px solid #c8c8c8;
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: left;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: #111;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    user-select: none;
+    cursor: default;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 8px,
+      rgba(0,0,0,0.03) 8px, rgba(0,0,0,0.03) 9px
+    );
+    position: relative;
+    overflow: hidden;
+  }
+  .captcha-box::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: rgba(0,0,0,0.18);
+  }
+
+  /* buttons */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .btn-clear {
+    background: #d4911a;
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.3);
+  }
+  .btn-validate {
+    background: #4a9048;
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-clear:active, .btn-validate:active { opacity: 0.85; }
+
+  .error-msg {
+    color: #c0392b;
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+    background: #fdecea;
+    border-radius: 6px;
+    display: none;
+  }
+  .loading-msg {
+    display: none;
+    text-align: center;
+    padding: 10px;
+    color: #555;
+    font-size: 13px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid #ccc;
+    border-top-color: #4a9048;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESULT PAGES ── */
+  .result-page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+  .result-page.valid-page  { background: #e8f5e2; }
+  .result-page.invalid-page { background: #fbe8e8; }
+
+  .badge {
+    width: 230px; height: 230px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    margin: 36px auto 28px;
+    padding: 24px;
+  }
+  .badge-green { background: #2e9e4f; }
+  .badge-red   { background: #c0392b; }
+  .badge span  {
+    color: white;
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.18;
+  }
+
+  .result-title {
+    font-size: 21px;
+    font-weight: 900;
+    text-align: center;
+    color: #111;
+    margin-bottom: 6px;
+    padding: 0 20px;
+    line-height: 1.3;
+  }
+  .result-date {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 14px;
+    padding: 0 16px;
+  }
+
+  /* data table */
+  .data-table {
+    width: calc(100% - 24px);
+    margin: 0 12px 20px;
+    border-collapse: collapse;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+  }
+  .data-table tr { border-bottom: 1px solid #ddd; }
+  .data-table tr:last-child { border-bottom: none; }
+  .data-table td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    font-size: 13px;
+  }
+  .data-table td.key {
+    color: #222;
+    font-weight: bold;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    width: 46%;
+    line-height: 1.3;
+  }
+  .data-table td.val {
+    color: #1a8a6e;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .data-table tr:nth-child(odd)  td { background: #f7f7f7; }
+  .data-table tr:nth-child(even) td { background: #ffffff; }
+
+  .close-row {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 12px;
+  }
+  .btn-close {
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 14px 32px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .btn-close:active { opacity: 0.85; }
+
+  /* ── SETUP BANNER ── */
+  .setup-banner {
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: 8px;
+    padding: 11px 14px;
+    margin: 0 12px 14px;
+    font-size: 12px;
+    color: #7a5c00;
+    line-height: 1.5;
+  }
+  .setup-banner strong { display: block; margin-bottom: 3px; font-size: 12.5px; }
+  .setup-banner a { color: #0d6efd; text-decoration: underline; }
+
+  /* ── DESKTOP ── */
+  @media (min-width: 600px) {
+    body { background: #ebebeb; }
+    .page { max-width: 680px; padding-bottom: 60px; }
+    .form-heading { font-size: 26px; margin-top: 36px; }
+    .form-card { margin: 0 20px; padding: 28px 24px; gap: 18px; }
+    .field-input { font-size: 17px; padding: 16px 14px; }
+    .captcha-box { font-size: 32px; }
+    .result-page { max-width: 680px; }
+    .badge { width: 270px; height: 270px; }
+    .badge span { font-size: 36px; }
+    .result-title { font-size: 26px; }
+    .data-table td { padding: 12px 16px; font-size: 14px; }
+    .data-table td.key { font-size: 12.5px; }
+    .data-table td.val { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════ FORM PAGE ════════ -->
+<div class="page" id="formPage">
+  <h1 class="form-heading">Valida tu permiso</h1>
+  <p class="form-subtext">Por favor, captura los datos que se encuentran en tu Permiso de Importación</p>
+
+  <div id="setupBanner" class="setup-banner">
+    <strong>⚙️ Configuración requerida</strong>
+    Reemplaza <code>YOUR_GOOGLE_SHEET_ID_HERE</code> en el código con el ID de tu Google Sheet publicado como CSV.
+    <a href="#" onclick="showSetupHelp();return false;">Ver instrucciones</a>
+  </div>
+
+  <div class="form-card">
+    <div>
+      <div class="field-label">Folio de Permiso:</div>
+      <input class="field-input" type="text" id="folio" placeholder="Folio permiso" maxlength="20" inputmode="numeric">
+    </div>
+    <div>
+      <div class="field-label">Últimos 5 caracteres del número de serie del vehículo o HIN del vehículo:</div>
+      <input class="field-input" type="text" id="vin5" placeholder="VIN/HIN" maxlength="5" style="text-transform:uppercase;">
+    </div>
+    <div>
+      <div class="field-label">Últimos 5 caracteres del número de documento o del RFC:</div>
+      <input class="field-input" type="text" id="rfc5" placeholder="Número de documento o RFC" maxlength="5" style="text-transform:uppercase;">
+    </div>
+
+    <div class="captcha-box" id="captchaDisplay"></div>
+    <input class="field-input" type="text" id="captchaInput" placeholder="Captcha" maxlength="6" autocomplete="off">
+
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="loading-msg" id="loadingMsg"><span class="spinner"></span>Verificando permiso...</div>
+
+    <div class="btn-row">
+      <button class="btn-clear" onclick="clearForm()">LIMPIAR</button>
+      <button class="btn-validate" id="validateBtn" onclick="validatePermit()">VALIDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ VALID PAGE ════════ -->
+<div class="result-page valid-page" id="validPage">
+  <div class="badge badge-green"><span>¡Permiso<br>Vigente!</span></div>
+  <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
+  <div class="result-date" id="validDate"></div>
+  <table class="data-table" id="validTable"></table>
+  <div class="close-row">
+    <button class="btn-close" onclick="resetAll()">CERRAR</button>
+  </div>
+</div>
+
+<!-- ════════ INVALID PAGE ════════ -->
+<div class="result-page invalid-page" id="invalidPage">
+  <div class="badge badge-red"><span>¡Permiso<br>Vencido!</span></div>
+  <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
+  <div class="result-date" id="invalidDate"></div>
+  <table class="data-table" id="invalidTable"></table>
+  <div class="close-row">
+    <button class="btn-close" onclick="resetAll()">CERRAR</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIGURATION
+//  Replace with your Google Sheet ID
+//  (File → Share → Publish to web → CSV → copy ID from URL)
+// ══════════════════════════════════════════
+const SHEET_ID  = "YOUR_GOOGLE_SHEET_ID_HERE";
+const SHEET_GID = "0";
+
+// ── Captcha ──────────────────────────────
+let currentCaptcha = "";
+function generateCaptcha() {
+  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  currentCaptcha = Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join("");
+  document.getElementById("captchaDisplay").textContent = currentCaptcha;
+}
+
+// ── Google Sheets CSV fetch ───────────────
+async function fetchSheetData() {
+  if (SHEET_ID === "YOUR_GOOGLE_SHEET_ID_HERE") {
+    // Demo mode
+    return [
+      { FOLIO:"11111111", VIN5:"11111", RFC5:"11111", FECHA_ALTA:"14/ABR/2026", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" },
+      { FOLIO:"22222222", VIN5:"22222", RFC5:"22222", FECHA_ALTA:"04/SEP/2025", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" }
+    ];
+  }
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error("Error al acceder a la hoja.");
+  return parseCSV(await resp.text());
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  const headers = lines[0].split(",").map(h => h.trim().replace(/"/g,""));
+  return lines.slice(1).map(line => {
+    const vals = line.split(",").map(v => v.trim().replace(/"/g,""));
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = vals[i] || "");
+    return obj;
+  });
+}
+
+// ── 180-day calculation ───────────────────
+function calcPermitStatus(fechaAltaStr) {
+  const MON = {ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11};
+  const MON_NAME = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+  let start;
+  try {
+    const p = fechaAltaStr.trim().split("/");
+    if (p.length === 3 && isNaN(p[1])) {
+      start = new Date(+p[2], MON[p[1].toUpperCase()], +p[0]);
+    } else if (p.length === 3) {
+      start = new Date(+p[2], +p[0]-1, +p[1]);
+    } else {
+      start = new Date(fechaAltaStr);
+    }
+  } catch { start = new Date(fechaAltaStr); }
+
+  const expiry = new Date(start);
+  expiry.setDate(expiry.getDate() + 180);
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dias = Math.max(0, Math.floor((expiry - today) / 86400000));
+
+  const d = String(expiry.getDate()).padStart(2,"0");
+  const fechaMax = `${d}/${MON_NAME[expiry.getMonth()]}/${expiry.getFullYear()}`;
+
+  return { dias, fechaMax, isValid: dias > 0 };
+}
+
+// ── Validate ─────────────────────────────
+async function validatePermit() {
+  const folio  = document.getElementById("folio").value.trim();
+  const vin5   = document.getElementById("vin5").value.trim().toUpperCase();
+  const rfc5   = document.getElementById("rfc5").value.trim().toUpperCase();
+  const captcha = document.getElementById("captchaInput").value.trim();
+  const errEl  = document.getElementById("errorMsg");
+  errEl.style.display = "none";
+
+  if (!folio || !vin5 || !rfc5 || !captcha) {
+    errEl.textContent = "Por favor completa todos los campos.";
+    errEl.style.display = "block";
+    return;
+  }
+  if (captcha !== currentCaptcha) {
+    errEl.textContent = "Captcha incorrecto. Intenta de nuevo.";
+    errEl.style.display = "block";
+    generateCaptcha();
+    document.getElementById("captchaInput").value = "";
+    return;
+  }
+
+  document.getElementById("loadingMsg").style.display = "block";
+  document.getElementById("validateBtn").disabled = true;
+
+  try {
+    const records = await fetchSheetData();
+    const match = records.find(r =>
+      r.FOLIO?.trim() === folio &&
+      r.VIN5?.trim().toUpperCase()  === vin5 &&
+      r.RFC5?.trim().toUpperCase()  === rfc5
+    );
+
+    document.getElementById("loadingMsg").style.display = "none";
+    document.getElementById("validateBtn").disabled = false;
+
+    const dateStr = formatDateTime();
+
+    if (match) {
+      const { dias, fechaMax, isValid } = calcPermitStatus(match.FECHA_ALTA);
+      renderResult({
+        folio:     match.FOLIO,
+        fechaAlta: match.FECHA_ALTA,
+        fechaMax,
+        dias:      String(dias),
+        marca:     match.MARCA,
+        vin:       match.VIN,
+        modelo:    match.MODELO,
+        estatus:   isValid ? "VIGENTE" : "PERMISO VENCIDO",
+        remolque:  match.REMOLQUE
+      }, dateStr, isValid);
+    } else {
+      renderResult({
+        folio, fechaAlta:"—", fechaMax:"—", dias:"0",
+        marca:"—", vin:"—", modelo:"—",
+        estatus:"PERMISO VENCIDO", remolque:"—"
+      }, dateStr, false);
+    }
+  } catch(e) {
+    document.getElementById("loadingMsg").style.display = "none";
+    document.getElementById("validateBtn").disabled = false;
+    const errEl = document.getElementById("errorMsg");
+    errEl.textContent = "Error al conectar. Intenta de nuevo.";
+    errEl.style.display = "block";
+    generateCaptcha();
+  }
+}
+
+function renderResult(d, dateStr, isValid) {
+  const rows = [
+    ["FOLIO PERMISO",           d.folio],
+    ["FECHA DE ALTA",           d.fechaAlta],
+    ["FECHA MÁXIMA DE RETORNO", d.fechaMax],
+    ["DIAS DISPONIBLES",        d.dias],
+    ["MARCA",                   d.marca],
+    ["VIN",                     d.vin],
+    ["MODELO",                  d.modelo],
+    ["ESTATUS PERMISO",         d.estatus],
+    ["REMOLQUE",                d.remolque],
+  ];
+  const html = rows.map(([k,v]) =>
+    `<tr><td class="key">${k}:</td><td class="val">${v}</td></tr>`
+  ).join("");
+
+  document.getElementById("formPage").style.display = "none";
+
+  if (isValid) {
+    document.getElementById("validDate").textContent  = "FECHA Y HORA DE CONSULTA: " + dateStr;
+    document.getElementById("validTable").innerHTML   = html;
+    const pg = document.getElementById("validPage");
+    pg.style.display = "flex";
+  } else {
+    document.getElementById("invalidDate").textContent = "FECHA Y HORA DE CONSULTA: " + dateStr;
+    document.getElementById("invalidTable").innerHTML  = html;
+    const pg = document.getElementById("invalidPage");
+    pg.style.display = "flex";
+  }
+  window.scrollTo(0,0);
+}
+
+function formatDateTime() {
+  const now = new Date();
+  const M = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const p = n => String(n).padStart(2,"0");
+  return `${now.getDate()} de ${M[now.getMonth()]} del ${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
+
+function clearForm() {
+  ["folio","vin5","rfc5","captchaInput"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("errorMsg").style.display = "none";
+  generateCaptcha();
+}
+
+function resetAll() {
+  document.getElementById("validPage").style.display   = "none";
+  document.getElementById("invalidPage").style.display = "none";
+  document.getElementById("formPage").style.display    = "block";
+  clearForm();
+  window.scrollTo(0,0);
+}
+
+function showSetupHelp() {
+  alert(
+    "CONFIGURAR GOOGLE SHEETS:\n\n" +
+    "1. Crea una hoja con columnas exactas:\n" +
+    "   FOLIO, VIN5, RFC5, FECHA_ALTA, MARCA, VIN, MODELO, REMOLQUE\n\n" +
+    "2. FECHA_ALTA en formato DD/MES/AAAA (ej: 14/ABR/2026)\n" +
+    "   El sistema calcula automáticamente 180 días y días disponibles.\n\n" +
+    "3. Archivo → Compartir → Publicar en la web → CSV → Publicar\n\n" +
+    "4. Copia el ID de la URL:\n" +
+    "   docs.google.com/spreadsheets/d/[ESTE_ID]/edit\n\n" +
+    "5. Reemplaza YOUR_GOOGLE_SHEET_ID_HERE en el HTML con ese ID.\n\n" +
+    "──────────────────────────\n" +
+    "DEMO VIGENTE:  FOLIO=11111111 / VIN5=11111 / RFC5=11111\n" +
+    "DEMO VENCIDO:  FOLIO=22222222 / VIN5=22222 / RFC5=22222"
+  );
+}
+
+// ── Init ─────────────────────────────────
+if (SHEET_ID !== "YOUR_GOOGLE_SHEET_ID_HERE") {
+  document.getElementById("setupBanner").style.display = "none";
+}
+generateCaptcha();
+</script>
+</body>
+</html>
