@@ -429,7 +429,7 @@ async function validatePermit() {
     document.getElementById("validateBtn").disabled=false;
     const dateStr = formatDateTime();
     if (match) {
-      const {dias,fechaMax,isValid} = calcPermitStatus(match.FECHA_ALTA);
+      const {dias,fechaMax,isValid} = calcPermitStatus(match.FECHA_TERMINACION);
       renderResult({folio:match.FOLIO,fechaAlta:match.FECHA_ALTA,fechaMax,dias:String(dias),marca:match.MARCA,vin:match.VIN,modelo:match.MODELO,estatus:isValid?"VIGENTE":"PERMISO VENCIDO",remolque:match.REMOLQUE},dateStr,isValid);
     } else {
       renderResult({folio,fechaAlta:"—",fechaMax:"—",dias:"0",marca:"—",vin:"—",modelo:"—",estatus:"PERMISO VENCIDO",remolque:"—"},dateStr,false);
