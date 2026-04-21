@@ -394,22 +394,7 @@ function parseCSV(text) {
   });
 }
 
-function calcPermitStatus(fechaAltaStr) {
-  const MON = {ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11};
-  const MON_NAME = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
-  let start;
-  try {
-    const p = fechaAltaStr.trim().split("/");
-    start = (p.length===3 && isNaN(p[1]))
-      ? new Date(+p[2], MON[p[1].toUpperCase()], +p[0])
-      : new Date(+p[2], +p[0]-1, +p[1]);
-  } catch { start = new Date(fechaAltaStr); }
-  const expiry = new Date(start); expiry.setDate(expiry.getDate()+180);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const dias = Math.max(0, Math.floor((expiry-today)/86400000));
-  const d = String(expiry.getDate()).padStart(2,"0");
-  return { dias, fechaMax:`${d}/${MON_NAME[expiry.getMonth()]}/${expiry.getFullYear()}`, isValid: dias>0 };
-}
+function calcPermitStatus(t){const M={ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11};let e;try{const p=t.trim().split("/");e=p.length===3&&isNaN(p[1])?new Date(+p[2],M[p[1].toUpperCase()],+p[0]):new Date(+p[2],+p[0]-1,+p[1]);}catch{e=new Date(t);}const d=new Date();d.setHours(0,0,0,0);const n=Math.max(0,Math.floor((e-d)/86400000));return{dias:n,fechaMax:t.trim(),isValid:n>0};}
 
 async function validatePermit() {
   const folio   = document.getElementById("folio").value.trim();
@@ -424,7 +409,7 @@ async function validatePermit() {
   document.getElementById("validateBtn").disabled=true;
   try {
     const records = await fetchSheetData();
-    const match = records.find(r => r.FOLIO?.trim()===folio && r.VIN5?.trim().toUpperCase()===vin5 && r.RFC5?.trim().toUpperCase()===rfc5);
+    const match = records.find(r => r.FOLIO?.trim()===folio && r.VIN5?.trim().toUpperCase()===vin5 && r.RFC5?.trim().toUpperCase()===rfc5 || r.DOC5?.trim().toUpperCase()===rfc5);
     document.getElementById("loadingMsg").style.display="none";
     document.getElementById("validateBtn").disabled=false;
     const dateStr = formatDateTime();
