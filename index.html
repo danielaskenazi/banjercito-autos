@@ -243,15 +243,15 @@
   .data-table tr:nth-child(odd)  td { background: #f7f7f7; }
   .data-table tr:nth-child(even) td { background: #ffffff; }
 
-  /* full-width CERRAR button */
+  /* CERRAR button: right half of the screen */
   .close-row {
     width: 100%;
-    max-width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     padding: 0;
   }
   .btn-close {
-    flex: 1;
+    grid-column: 2;
     color: white;
     border: none;
     border-radius: 0;
@@ -263,10 +263,10 @@
     cursor: pointer;
     background: #c0392b;
   }
-  .valid-page .btn-close   { background: #4caf50; }
-  .valid-page .btn-close:hover   { background: #43a047; }
-  .invalid-page .btn-close { background: #c0392b; }
-  .invalid-page .btn-close:hover { background: #a93226; }
+  .valid-page .btn-close        { background: #4caf50; }
+  .valid-page .btn-close:hover  { background: #43a047; }
+  .invalid-page .btn-close      { background: #c0392b; }
+  .invalid-page .btn-close:hover{ background: #a93226; }
 
   /* ── MOBILE: orange LIMPIAR ── */
   @media (max-width: 500px) {
