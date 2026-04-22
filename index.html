@@ -335,12 +335,10 @@ function drawCaptcha(text) {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // Font: rounded outline style
   ctx.font = "bold 34px Arial Rounded MT Bold, Arial, sans-serif";
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
 
-  // Draw each character with slight random rotation for natural look
   const chars = text.split("");
   const totalWidth = chars.length * 30;
   const startX = (W - totalWidth) / 2 + 15;
@@ -352,8 +350,6 @@ function drawCaptcha(text) {
     const angle = (Math.random() * 0.2 - 0.1);
     ctx.translate(x, y);
     ctx.rotate(angle);
-
-    // Hollow: stroke only, no fill
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = "#555";
     ctx.lineJoin = "round";
@@ -361,7 +357,6 @@ function drawCaptcha(text) {
     ctx.restore();
   });
 
-  // Subtle noise lines
   ctx.strokeStyle = "rgba(100,100,100,0.15)";
   ctx.lineWidth = 1;
   for (let i = 0; i < 3; i++) {
@@ -373,13 +368,7 @@ function drawCaptcha(text) {
 }
 
 async function fetchSheetData() {
-  if (SHEET_ID === "YOUR_GOOGLE_SHEET_ID_HERE") {
-    return [
-      { FOLIO:"11111111", VIN5:"11111", RFC5:"11111", FECHA_ALTA:"14/ABR/2026", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" },
-      { FOLIO:"22222222", VIN5:"22222", RFC5:"22222", FECHA_ALTA:"04/SEP/2025", MARCA:"TESLA", VIN:"*********SA080386", MODELO:"2025", REMOLQUE:"SIN REMOLQUE" }
-    ];
-  }
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQPhPAvXfCVteR537rP5Kyb4ibDPn0KzyTaAThXYNbynXsg0Dz6rFAFo-amk-KfbIljTlp1Igm9Y3Qa/pub?gid=0&single=true&output=csv";
   const resp = await fetch(url);
   if (!resp.ok) throw new Error("Error.");
   return parseCSV(await resp.text());
@@ -409,7 +398,11 @@ async function validatePermit() {
   document.getElementById("validateBtn").disabled=true;
   try {
     const records = await fetchSheetData();
-    const match = records.find(r => r.FOLIO?.trim()===folio && r.VIN5?.trim().toUpperCase()===vin5 && r.RFC5?.trim().toUpperCase()===rfc5 || r.DOC5?.trim().toUpperCase()===rfc5);
+    const match = records.find(r =>
+      r.FOLIO?.trim() === folio &&
+      r.VIN5?.trim().toUpperCase() === vin5 &&
+      (r.RFC5?.trim().toUpperCase() === rfc5 || r.DOC5?.trim().toUpperCase() === rfc5)
+    );
     document.getElementById("loadingMsg").style.display="none";
     document.getElementById("validateBtn").disabled=false;
     const dateStr = formatDateTime();
@@ -461,9 +454,6 @@ function resetAll() {
   document.getElementById("formPage").style.display="block";
   clearForm(); window.scrollTo(0,0);
 }
-
-
-
 
 generateCaptcha();
 </script>
