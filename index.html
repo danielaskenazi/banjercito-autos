@@ -167,22 +167,27 @@
   .result-page.valid-page   { background: #e8f5e2; }
   .result-page.invalid-page { background: #fbe8e8; }
 
+  /* pill badge matching original */
   .badge {
-    width: 220px; height: 220px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    width: calc(100% - 32px);
+    height: auto;
+    min-height: 180px;
+    border-radius: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    margin: 36px auto 24px;
-    padding: 20px;
+    margin: 20px auto 28px;
+    padding: 36px 24px;
     flex-shrink: 0;
   }
   .badge-green { background: #2e9e4f; }
   .badge-red   { background: #c0392b; }
   .badge span  {
     color: white;
-    font-size: 29px;
+    font-size: 52px;
     font-weight: 900;
-    line-height: 1.18;
+    line-height: 1.2;
   }
 
   .result-title {
@@ -201,16 +206,17 @@
     padding: 0 12px;
     text-align: left;
     width: 100%;
-    max-width: 560px;
+    max-width: 100%;
   }
 
+  /* table without card border, full width */
   .data-table {
-    width: calc(100% - 24px);
-    max-width: 536px;
-    margin: 0 12px 20px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 20px;
     border-collapse: collapse;
-    border: 1px solid #bbb;
-    border-radius: 6px;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     background: white;
   }
@@ -237,30 +243,36 @@
   .data-table tr:nth-child(odd)  td { background: #f7f7f7; }
   .data-table tr:nth-child(even) td { background: #ffffff; }
 
+  /* full-width CERRAR button */
   .close-row {
     width: 100%;
-    max-width: 560px;
+    max-width: 100%;
     display: flex;
-    justify-content: flex-end;
-    padding: 0 12px;
+    padding: 0;
   }
   .btn-close {
-    background: #c0392b;
+    flex: 1;
     color: white;
     border: none;
-    border-radius: 4px;
-    padding: 13px 30px;
-    font-size: 12px;
+    border-radius: 0;
+    padding: 16px 30px;
+    font-size: 13px;
     font-weight: bold;
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
+    background: #c0392b;
   }
+  .valid-page .btn-close   { background: #4caf50; }
+  .valid-page .btn-close:hover   { background: #43a047; }
+  .invalid-page .btn-close { background: #c0392b; }
+  .invalid-page .btn-close:hover { background: #a93226; }
 
   /* ── MOBILE: orange LIMPIAR ── */
   @media (max-width: 500px) {
     .btn-clear { background: #e09b2d; }
     .btn-clear:hover { background: #c98a22; }
+    .badge span { font-size: 38px; }
   }
 </style>
 </head>
@@ -298,7 +310,7 @@
 
 <!-- ════════ VALID PAGE ════════ -->
 <div class="result-page valid-page" id="validPage">
-  <div class="badge badge-green"><span>¡Permiso<br>Vigente!</span></div>
+  <div class="badge badge-green"><span>¡Permiso Vigente!</span></div>
   <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
   <div class="result-date" id="validDate"></div>
   <table class="data-table" id="validTable"></table>
@@ -309,7 +321,7 @@
 
 <!-- ════════ INVALID PAGE ════════ -->
 <div class="result-page invalid-page" id="invalidPage">
-  <div class="badge badge-red"><span>¡Permiso<br>Vencido!</span></div>
+  <div class="badge badge-red"><span>¡Permiso Vencido!</span></div>
   <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
   <div class="result-date" id="invalidDate"></div>
   <table class="data-table" id="invalidTable"></table>
