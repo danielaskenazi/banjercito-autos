@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valida tu Permiso - banjercito.autos</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+  }
+
+  /* ── FORM PAGE — full width, white bg ── */
+  .form-page {
+    width: 100%;
+    padding: 28px 16px 60px;
+  }
+
+  .form-page h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 14px;
+  }
+
+  .form-page .subtext {
+    font-size: 15px;
+    font-weight: normal;
+    color: #111;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* grey card — full width minus small margin */
+  .form-card {
+    background: #f2f2f2;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 8px;
+    margin-top: 16px;
+    letter-spacing: 0.1px;
+  }
+  .field-label:first-child { margin-top: 0; }
+
+  .field-input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 22px;
+    text-align: center;
+    background: white;
+    color: #333;
+    outline: none;
+    -webkit-appearance: none;
+    line-height: 1.2;
+  }
+  .field-input::placeholder {
+    color: #aaa;
+    font-size: 22px;
+    font-weight: normal;
+  }
+  .field-input:focus { border-color: #999; }
+
+  /* captcha canvas */
+  .captcha-wrap {
+    margin: 20px 0 6px;
+    text-align: center;
+  }
+  #captchaCanvas {
+    display: block;
+    margin: 0 auto;
+    cursor: default;
+    user-select: none;
+  }
+
+  .error-msg {
+    color: #c0392b;
+    font-size: 12px;
+    text-align: center;
+    padding: 7px;
+    background: #fdecea;
+    border-radius: 4px;
+    margin-top: 10px;
+    display: none;
+  }
+  .loading-msg {
+    display: none;
+    text-align: center;
+    padding: 8px;
+    color: #555;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid #ccc;
+    border-top-color: #4caf50;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* buttons — both green on desktop, orange+green on mobile */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 16px;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+  }
+  .btn-clear {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.25);
+  }
+  .btn-validate {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 11px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .btn-clear:hover    { background: #43a047; }
+  .btn-validate:hover { background: #43a047; }
+  .btn-validate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+
+
+  /* ── RESULT PAGES ── */
+  .result-page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 50px;
+  }
+  .result-page.valid-page   { background: #e8f5e2; }
+  .result-page.invalid-page { background: #fbe8e8; }
+
+  /* pill badge matching original */
+  .badge {
+    width: calc(100% - 32px);
+    height: auto;
+    min-height: 180px;
+    border-radius: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 20px auto 28px;
+    padding: 36px 24px;
+    flex-shrink: 0;
+  }
+  .badge-green { background: #2e9e4f; }
+  .badge-red   { background: #c0392b; }
+  .badge span  {
+    color: white;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  .result-title {
+    font-size: 20px;
+    font-weight: 900;
+    text-align: center;
+    color: #111;
+    margin-bottom: 6px;
+    padding: 0 20px;
+    line-height: 1.3;
+  }
+  .result-date {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 14px;
+    padding: 0 12px;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* table without card border, full width */
+  .data-table {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 20px;
+    border-collapse: collapse;
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    background: white;
+  }
+  .data-table tr { border-bottom: 1px solid #ddd; }
+  .data-table tr:last-child { border-bottom: none; }
+  .data-table td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    font-size: 13px;
+  }
+  .data-table td.key {
+    color: #222;
+    font-weight: bold;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    width: 46%;
+    line-height: 1.3;
+  }
+  .data-table td.val {
+    color: #1a8a6e;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .data-table tr:nth-child(odd)  td { background: #f7f7f7; }
+  .data-table tr:nth-child(even) td { background: #ffffff; }
+
+  /* CERRAR button: right half of the screen */
+  .close-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0;
+  }
+  .btn-close {
+    grid-column: 2;
+    color: white;
+    border: none;
+    border-radius: 0;
+    padding: 16px 30px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: #c0392b;
+  }
+  .valid-page .btn-close        { background: #4caf50; }
+  .valid-page .btn-close:hover  { background: #43a047; }
+  .invalid-page .btn-close      { background: #c0392b; }
+  .invalid-page .btn-close:hover{ background: #a93226; }
+
+  /* ── MOBILE: orange LIMPIAR ── */
+  @media (max-width: 500px) {
+    .btn-clear { background: #e09b2d; }
+    .btn-clear:hover { background: #c98a22; }
+    .badge span { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════ FORM PAGE ════════ -->
+<div class="form-page" id="formPage">
+  <h1>Valida tu permiso</h1>
+  <p class="subtext">Por favor, captura los datos que se encuentran en tu Permiso de Importación</p>
+  <div class="form-card">
+    <div class="field-label">FOLIO DE PERMISO:</div>
+    <input class="field-input" type="text" id="folio" placeholder="Folio permiso" maxlength="20" inputmode="numeric" autocomplete="off">
+
+    <div class="field-label">ÚLTIMOS 5 CARACTERES DEL NÚMERO DE SERIE DEL VEHÍCULO O HIN DEL VEHÍCULO:</div>
+    <input class="field-input" type="text" id="vin5" placeholder="VIN/HIN" maxlength="5" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+
+    <div class="field-label">ÚLTIMOS 5 CARACTERES DEL NÚMERO DE DOCUMENTO O DEL RFC:</div>
+    <input class="field-input" type="text" id="rfc5" placeholder="Número de documento o RFC" maxlength="5" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+
+    <div class="captcha-wrap">
+      <canvas id="captchaCanvas" width="220" height="52"></canvas>
+    </div>
+
+    <input class="field-input" type="text" id="captchaInput" placeholder="Captcha" maxlength="6" autocomplete="off">
+
+    <div class="error-msg"   id="errorMsg"></div>
+    <div class="loading-msg" id="loadingMsg"><span class="spinner"></span>Verificando permiso...</div>
+
+    <div class="btn-row">
+      <button class="btn-clear"    onclick="clearForm()">LIMPIAR</button>
+      <button class="btn-validate" id="validateBtn" onclick="validatePermit()">VALIDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ VALID PAGE ════════ -->
+<div class="result-page valid-page" id="validPage">
+  <div class="badge badge-green"><span>¡Permiso Vigente!</span></div>
+  <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
+  <div class="result-date" id="validDate"></div>
+  <table class="data-table" id="validTable"></table>
+  <div class="close-row">
+    <button class="btn-close" onclick="resetAll()">CERRAR</button>
+  </div>
+</div>
+
+<!-- ════════ INVALID PAGE ════════ -->
+<div class="result-page invalid-page" id="invalidPage">
+  <div class="badge badge-red"><span>¡Permiso Vencido!</span></div>
+  <div class="result-title">Permiso de Importación<br>de Auto Americano</div>
+  <div class="result-date" id="invalidDate"></div>
+  <table class="data-table" id="invalidTable"></table>
+  <div class="close-row">
+    <button class="btn-close" onclick="resetAll()">CERRAR</button>
+  </div>
+</div>
+
+<script>
+const SHEET_ID  = "1mvqzYpu_DU1c3CXDSEjxeB5eA0aSmThZodImFWNUUmU";
+const SHEET_GID = "0";
+
+let currentCaptcha = "";
+function generateCaptcha() {
+  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  currentCaptcha = Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join("");
+  drawCaptcha(currentCaptcha);
+}
+
+function drawCaptcha(text) {
+  const canvas = document.getElementById("captchaCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+
+  const chars = text.split("");
+  const totalWidth = chars.length * 30;
+  const startX = (W - totalWidth) / 2 + 15;
+
+  chars.forEach((ch, i) => {
+    ctx.save();
+    const x = startX + i * 30;
+    const y = H / 2 + (Math.random() * 4 - 2);
+    const angle = (Math.random() * 0.2 - 0.1);
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.font = "32px Arial, sans-serif";
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#999";
+    ctx.lineJoin = "round";
+    ctx.strokeText(ch, 0, 0);
+    ctx.restore();
+  });
+
+  ctx.strokeStyle = "rgba(100,100,100,0.15)";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.moveTo(Math.random() * W, Math.random() * H);
+    ctx.lineTo(Math.random() * W, Math.random() * H);
+    ctx.stroke();
+  }
+}
+
+async function fetchSheetData() {
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQPhPAvXfCVteR537rP5Kyb4ibDPn0KzyTaAThXYNbynXsg0Dz6rFAFo-amk-KfbIljTlp1Igm9Y3Qa/pub?gid=0&single=true&output=csv";
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error("Error.");
+  return parseCSV(await resp.text());
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  const headers = lines[0].split(",").map(h => h.trim().replace(/"/g,""));
+  return lines.slice(1).map(line => {
+    const vals = line.split(",").map(v => v.trim().replace(/"/g,""));
+    const obj = {}; headers.forEach((h,i) => obj[h] = vals[i] || ""); return obj;
+  });
+}
+
+function calcPermitStatus(t){const M={ENE:0,FEB:1,MAR:2,ABR:3,MAY:4,JUN:5,JUL:6,AGO:7,SEP:8,OCT:9,NOV:10,DIC:11};let e;try{const p=t.trim().split("/");e=p.length===3&&isNaN(p[1])?new Date(+p[2],M[p[1].toUpperCase()],+p[0]):new Date(+p[2],+p[0]-1,+p[1]);}catch{e=new Date(t);}const d=new Date();d.setHours(0,0,0,0);const n=Math.max(0,Math.floor((e-d)/86400000));return{dias:n,fechaMax:t.trim(),isValid:n>0};}
+
+async function validatePermit() {
+  const folio   = document.getElementById("folio").value.trim();
+  const vin5    = document.getElementById("vin5").value.trim().toUpperCase();
+  const rfc5    = document.getElementById("rfc5").value.trim().toUpperCase();
+  const captcha = document.getElementById("captchaInput").value.trim();
+  const errEl   = document.getElementById("errorMsg");
+  errEl.style.display = "none";
+  if (!folio||!vin5||!rfc5||!captcha) { errEl.textContent="Por favor completa todos los campos."; errEl.style.display="block"; return; }
+  if (captcha !== currentCaptcha) { errEl.textContent="Captcha incorrecto. Intenta de nuevo."; errEl.style.display="block"; generateCaptcha(); document.getElementById("captchaInput").value=""; return; }
+  document.getElementById("loadingMsg").style.display="block";
+  document.getElementById("validateBtn").disabled=true;
+  try {
+    const records = await fetchSheetData();
+    const match = records.find(r =>
+      r.FOLIO?.trim() === folio &&
+      r.VIN5?.trim().toUpperCase() === vin5 &&
+      (r.RFC5?.trim().toUpperCase() === rfc5 || r.DOC5?.trim().toUpperCase() === rfc5)
+    );
+    document.getElementById("loadingMsg").style.display="none";
+    document.getElementById("validateBtn").disabled=false;
+    const dateStr = formatDateTime();
+    if (match) {
+      const {dias,fechaMax,isValid} = calcPermitStatus(match.FECHA_TERMINACION);
+      renderResult({folio:match.FOLIO,fechaAlta:match.FECHA_ALTA,fechaMax,dias:String(dias),marca:match.MARCA,vin:match.VIN,modelo:match.MODELO,estatus:isValid?"VIGENTE":"PERMISO VENCIDO",remolque:match.REMOLQUE},dateStr,isValid);
+    } else {
+      renderResult({folio,fechaAlta:"—",fechaMax:"—",dias:"0",marca:"—",vin:"—",modelo:"—",estatus:"PERMISO VENCIDO",remolque:"—"},dateStr,false);
+    }
+  } catch(e) {
+    document.getElementById("loadingMsg").style.display="none";
+    document.getElementById("validateBtn").disabled=false;
+    errEl.textContent="Error al conectar. Intenta de nuevo."; errEl.style.display="block"; generateCaptcha();
+  }
+}
+
+function renderResult(d, dateStr, isValid) {
+  const rows=[["FOLIO PERMISO",d.folio],["FECHA DE ALTA",d.fechaAlta],["FECHA MÁXIMA DE RETORNO",d.fechaMax],["DIAS DISPONIBLES",d.dias],["MARCA",d.marca],["VIN",d.vin],["MODELO",d.modelo],["ESTATUS PERMISO",d.estatus],["REMOLQUE",d.remolque]];
+  const html=rows.map(([k,v])=>`<tr><td class="key">${k}:</td><td class="val">${v}</td></tr>`).join("");
+  document.getElementById("formPage").style.display="none";
+  if (isValid) {
+    document.getElementById("validDate").textContent="FECHA Y HORA DE CONSULTA: "+dateStr;
+    document.getElementById("validTable").innerHTML=html;
+    document.getElementById("validPage").style.display="flex";
+  } else {
+    document.getElementById("invalidDate").textContent="FECHA Y HORA DE CONSULTA: "+dateStr;
+    document.getElementById("invalidTable").innerHTML=html;
+    document.getElementById("invalidPage").style.display="flex";
+  }
+  window.scrollTo(0,0);
+}
+
+function formatDateTime() {
+  const now=new Date();
+  const M=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const p=n=>String(n).padStart(2,"0");
+  return `${now.getDate()} de ${M[now.getMonth()]} del ${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
+
+function clearForm() {
+  ["folio","vin5","rfc5","captchaInput"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("errorMsg").style.display="none";
+  generateCaptcha();
+}
+
+function resetAll() {
+  document.getElementById("validPage").style.display="none";
+  document.getElementById("invalidPage").style.display="none";
+  document.getElementById("formPage").style.display="block";
+  clearForm(); window.scrollTo(0,0);
+}
+
+generateCaptcha();
+</script>
+</body>
+</html>
